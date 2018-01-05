@@ -48,6 +48,7 @@ public class PersonEndpoint {
 		return persons.get(id - 1);
 	}
 
+//	TO BE CHECKED!
 //	@GET
 //	@Path("/{id}/numbers")
 //	@Produces(MediaType.APPLICATION_JSON)
