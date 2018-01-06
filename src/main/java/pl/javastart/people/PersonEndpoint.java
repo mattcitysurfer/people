@@ -2,6 +2,8 @@ package pl.javastart.people;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -14,6 +16,7 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 
 @Path("/persons")
+@Produces(MediaType.APPLICATION_JSON)
 public class PersonEndpoint {
 
 	private static List<Person> persons;
@@ -29,9 +32,8 @@ public class PersonEndpoint {
 	}
 
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
 	public List<Person> getAllPersons(@QueryParam("orderBy") @DefaultValue("asc") String order) {
-
+		
 		if ("asc".equals(order)) {
 			persons.sort((a, b) -> a.getSurname().compareTo(b.getSurname()));
 		} else if ("desc".equals(order)) {
@@ -43,23 +45,18 @@ public class PersonEndpoint {
 
 	@GET
 	@Path("/{id}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public Person getPerson(@PathParam("id") int id) {
 		return persons.get(id - 1);
 	}
 
-//	TO BE CHECKED!
-//	@GET
-//	@Path("/{id}/numbers")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public GenericEntity<List<String>> getAllNumbers(@PathParam("id") int id){
-//		List <String> numbers = persons.get(id-1).getNumbers();
-//		return new GenericEntity<List<String>>(numbers) {};
-//	}
-	
+	@GET
+	@Path("/{id}/numbers")
+	public List<String> getAllNumbers(@PathParam("id") int id) {
+		return persons.get(id - 1).getNumbers();
+	}
+
 	@GET
 	@Path("/{id}/numbers/{numberId}")
-	@Produces(MediaType.APPLICATION_JSON)
 	public String getNumber(@PathParam("id") int id, @PathParam("numberId") int numberId) {
 		if (persons.size() < id) {
 			return null;
