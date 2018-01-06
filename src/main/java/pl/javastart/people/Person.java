@@ -3,14 +3,26 @@ package pl.javastart.people;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Person implements Serializable {
 
+	@XmlTransient
 	private long id;
+	
+	@XmlElement(name="imię")
 	private String name;
+	
+	@XmlElement(name="nazwisko")
 	private String surname;
+	
+	@XmlElement(name="numery-telefonu")
 	private List<String> numbers;
 
 	public Person() {
