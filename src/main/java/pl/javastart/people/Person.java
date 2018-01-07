@@ -13,7 +13,12 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Person implements Serializable {
 
-	@XmlTransient
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	//@XmlTransient
 	private long id;
 	
 	@XmlElement(name="imię")
