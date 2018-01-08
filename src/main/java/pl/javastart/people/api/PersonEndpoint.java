@@ -1,4 +1,4 @@
-package pl.javastart.people;
+package pl.javastart.people.api;
 
 import java.util.List;
 
@@ -12,39 +12,45 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import pl.javastart.people.domain.Person;
+import pl.javastart.people.persisatnce.PersonDAO;
+import pl.javastart.people.persisatnce.PersonDAOImplDBSimulator;
+
 @Path("/persons")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class PersonEndpoint {
 
-	public List<Person> persons = getPersons();
+	private PersonDAO dao = new PersonDAOImplDBSimulator();
 
 	@GET
 	public List<Person> getAllPersons(@QueryParam("orderBy") @DefaultValue("asc") String order) {
-		System.out.println("Check GET");
-		if ("asc".equals(order)) {
-			persons.sort((a, b) -> a.getSurname().compareTo(b.getSurname()));
-		} else if ("desc".equals(order)) {
-			persons.sort((a, b) -> b.getSurname().compareTo(a.getSurname()));
-		}
+		System.out.println("CHECK getAllPersons");
 
-		return persons;
+		List<Person> allPersons = dao.getAllPersons();
+
+		 if ("asc".equals(order)) {
+		 allPersons.sort((a, b) -> a.getSurname().compareTo(b.getSurname()));
+		 } else if ("desc".equals(order)) {
+		 allPersons.sort((a, b) -> b.getSurname().compareTo(a.getSurname()));
+		 }
+
+		return allPersons;
 	}
 
 	@GET
 	@Path("/{id}")
 	public Person getPerson(@PathParam("id") int id) {
-		if (persons.size() < id) {
-			return null;
-		}
-		return persons.get(id - 1);
+		System.out.println("CHECK getPerson");
+
+		return dao.getPerson(id);
 	}
 
 	@POST
 	public Person savePerson(Person person) {
-		person.setId(persons.size() + 1);
-		persons.add(person);
-		return person;
+		System.out.println("CHECK savePerson");
+
+		return dao.addPerson(person);
 	}
 
 	// @GET
@@ -66,9 +72,5 @@ public class PersonEndpoint {
 	// return persons.get(id - 1).getNumbers().get(numberId - 1);
 	// }
 	// }
-
-	private List<Person> getPersons() {
-		return DBSimulator.getInstance().getPersons();
-	}
 
 }

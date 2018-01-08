@@ -1,4 +1,4 @@
-package pl.javastart.people;
+package pl.javastart.people.domain;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,16 +18,16 @@ public class Person implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	//@XmlTransient
+	// @XmlTransient
 	private long id;
-	
-	@XmlElement(name="imię")
+
+	@XmlElement(name = "imię")
 	private String name;
-	
-	@XmlElement(name="nazwisko")
+
+	@XmlElement(name = "nazwisko")
 	private String surname;
-	
-	@XmlElement(name="numery-telefonu")
+
+	@XmlElement(name = "numery-telefonu")
 	private List<String> numbers;
 
 	public Person() {
