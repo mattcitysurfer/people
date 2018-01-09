@@ -3,9 +3,11 @@ package pl.javastart.people.api;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -40,7 +42,7 @@ public class PersonEndpoint {
 
 	@GET
 	@Path("/{id}")
-	public Person getPerson(@PathParam("id") int id) {
+	public Person getPerson(@PathParam("id") long id) {
 		System.out.println("CHECK getPerson");
 
 		return dao.getPerson(id);
@@ -51,6 +53,23 @@ public class PersonEndpoint {
 		System.out.println("CHECK savePerson");
 
 		return dao.addPerson(person);
+	}
+	
+	@PUT
+	public Person updatePerson(Person person) {
+		System.out.println("CHECK savePerson");
+		
+		return dao.updatePerson(person);
+	}
+	
+	@DELETE
+	@Path("/{id}")
+	public Person deletePerson (@PathParam("id") long id) {
+		Person person = getPerson(id);
+		if(person != null) {
+			return dao.deletePerson(person);
+		}
+		return null;
 	}
 
 	// @GET

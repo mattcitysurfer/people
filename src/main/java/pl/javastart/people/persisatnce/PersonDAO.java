@@ -12,8 +12,8 @@ public interface PersonDAO {
 
 	public abstract List<Person> getAllPersons();
 
-	public abstract boolean updatePerson(Person person);
+	public abstract Person updatePerson(Person person);
 
-	public abstract boolean deletePerson(long id);
+	public abstract Person deletePerson(Person person);
 
 }

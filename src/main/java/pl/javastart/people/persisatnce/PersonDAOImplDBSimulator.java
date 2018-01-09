@@ -9,13 +9,14 @@ import pl.javastart.people.domain.Person;
 
 public class PersonDAOImplDBSimulator implements PersonDAO {
 
-	Map<Long, Person> persons = DBSimulator.getInstance().getPersons();
+	private static Map<Long, Person> persons = DBSimulator.getInstance().getPersons();
+
+	private static long nextId = persons.size() + 1;
 
 	@Override
 	public Person addPerson(Person person) {
-		long size = persons.size();
-		person.setId(size + 1);
-		return persons.put(size + 1, person);
+		person.setId(nextId++);
+		return persons.put(person.getId(), person);
 	}
 
 	@Override
@@ -34,15 +35,18 @@ public class PersonDAOImplDBSimulator implements PersonDAO {
 	}
 
 	@Override
-	public boolean updatePerson(Person person) {
-		// TODO Auto-generated method stub
-		return false;
+	public Person updatePerson(Person person) {
+		long id = person.getId();
+		if (persons.containsKey(id)) {
+			return persons.put(id, person);
+		}
+		return null;
 	}
 
 	@Override
-	public boolean deletePerson(long id) {
-		// TODO Auto-generated method stub
-		return false;
+	public Person deletePerson(Person person) {
+		long id = person.getId();
+		return persons.remove(id);
 	}
 
 }
