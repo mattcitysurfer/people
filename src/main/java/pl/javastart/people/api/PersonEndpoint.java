@@ -13,6 +13,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import pl.javastart.people.domain.Person;
 import pl.javastart.people.persisatnce.PersonDAO;
@@ -26,50 +29,66 @@ public class PersonEndpoint {
 	private PersonDAO dao = new PersonDAOImplDBSimulator();
 
 	@GET
-	public List<Person> getAllPersons(@QueryParam("orderBy") @DefaultValue("asc") String order) {
+	public Response getAllPersons(@QueryParam("orderBy") @DefaultValue("asc") String order) {
 		System.out.println("CHECK getAllPersons");
 
 		List<Person> allPersons = dao.getAllPersons();
 
-		 if ("asc".equals(order)) {
-		 allPersons.sort((a, b) -> a.getSurname().compareTo(b.getSurname()));
-		 } else if ("desc".equals(order)) {
-		 allPersons.sort((a, b) -> b.getSurname().compareTo(a.getSurname()));
-		 }
+		if ("asc".equals(order)) {
+			allPersons.sort((a, b) -> a.getSurname().compareTo(b.getSurname()));
+		} else if ("desc".equals(order)) {
+			allPersons.sort((a, b) -> b.getSurname().compareTo(a.getSurname()));
+		}
 
-		return allPersons;
+		Person[] allPersonsArray = allPersons.toArray(new Person[] {});
+
+		return setDetails(Response.ok().entity(allPersonsArray));
 	}
 
 	@GET
 	@Path("/{id}")
-	public Person getPerson(@PathParam("id") long id) {
+	public Response getPerson(@PathParam("id") long id) {
 		System.out.println("CHECK getPerson");
 
-		return dao.getPerson(id);
+		Person person = dao.getPerson(id);
+
+		if (person != null) {
+			return setDetails(Response.ok().entity(person));
+		} else {
+			return setDetails(Response.noContent());
+		}
 	}
 
 	@POST
-	public Person savePerson(Person person) {
+	public Response savePerson(Person person) {
 		System.out.println("CHECK savePerson");
 
-		return dao.addPerson(person);
+		dao.addPerson(person);
+		return setDetails(Response.ok().entity(person));
 	}
-	
+
 	@PUT
-	public Person updatePerson(Person person) {
+	public Response updatePerson(Person person) {
 		System.out.println("CHECK savePerson");
-		
-		return dao.updatePerson(person);
+		Person updatedPerson = dao.updatePerson(person);
+
+		if (updatedPerson != null) {
+			return setDetails(Response.ok().entity(updatedPerson));
+		} else {
+			return setDetails(Response.noContent());
+		}
 	}
-	
+
 	@DELETE
 	@Path("/{id}")
-	public Person deletePerson (@PathParam("id") long id) {
-		Person person = getPerson(id);
-		if(person != null) {
-			return dao.deletePerson(person);
+	public Response deletePerson(@PathParam("id") long id) {
+		Person person = (Person) getPerson(id).getEntity();
+		if (person != null) {
+			Person deletedPerson = dao.deletePerson(person);
+			return setDetails(Response.ok().entity(deletedPerson));
+		} else {
+			return setDetails(Response.noContent());
 		}
-		return null;
 	}
 
 	// @GET
@@ -92,4 +111,8 @@ public class PersonEndpoint {
 	// }
 	// }
 
+	private Response setDetails(ResponseBuilder responseBuilder) {
+		return responseBuilder.cookie(new NewCookie("auth-token", Long.toString(System.currentTimeMillis())))
+				.header("test-header", "example value").encoding("UTF-8").build();
+		}
 }
