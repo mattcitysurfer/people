@@ -1,10 +1,17 @@
 package pl.javastart.people.api;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -12,6 +19,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
@@ -27,7 +35,7 @@ import pl.javastart.people.persisatnce.PersonDAOImplDBSimulator;
 public class PersonEndpoint {
 
 	private PersonDAO dao = new PersonDAOImplDBSimulator();
-
+	
 	@GET
 	public Response getAllPersons(@QueryParam("orderBy") @DefaultValue("asc") String order) {
 		System.out.println("CHECK getAllPersons");
@@ -111,6 +119,33 @@ public class PersonEndpoint {
 	// }
 	// }
 
+	@POST
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public void savePersonFromForm(@FormParam("name") String name,
+										@FormParam("surname") String surname,
+										@FormParam("number") String number,
+										@Context HttpServletRequest request,
+										@Context HttpServletResponse response) throws ServletException, IOException
+	{
+		String warning = "";
+		if(!"".equals(name) && !"".equals(surname)) {
+			Person person = new Person();
+			person.setName(name);
+			person.setSurname(surname);
+			person.setNumbers(Arrays.asList(number));
+			dao.addPerson(person);
+			List<Person> persons = dao.getAllPersons();
+			request.getSession().setAttribute("persons", persons);
+		}else {
+			warning = "TRY AGAIN! Fields name and surname are obligatory";
+		}
+		//request.setAttribute("persons", persons);
+		//request.getRequestDispatcher("/").forward(request, response);
+		
+		request.getSession().setAttribute("warning", warning);
+		response.sendRedirect(request.getContextPath());
+	}
+	
 	private Response setDetails(ResponseBuilder responseBuilder) {
 		return responseBuilder.cookie(new NewCookie("auth-token", Long.toString(System.currentTimeMillis())))
 				.header("test-header", "example value").encoding("UTF-8").build();

@@ -74,4 +74,10 @@ public class Person implements Serializable {
 		this.numbers = numbers;
 	}
 
+	@Override
+	public String toString() {
+		String numbersToDisplay = (numbers!=null)?", tel: " + numbers.toString():", brak telefonu";
+		return id + ". " + name + " " + surname + numbersToDisplay;
+	}
+	
 }
