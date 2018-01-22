@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import pl.javastart.people.domain.Person;
 import pl.javastart.people.persisatnce.PersonDAO;
 import pl.javastart.people.persisatnce.PersonDAOImplDBSimulator;
+import pl.javastart.people.servlet.StartingServlet;
 
 @Path("/persons")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
@@ -35,6 +36,7 @@ import pl.javastart.people.persisatnce.PersonDAOImplDBSimulator;
 public class PersonEndpoint {
 
 	private PersonDAO dao = new PersonDAOImplDBSimulator();
+	String message = null;
 	
 	@GET
 	public Response getAllPersons(@QueryParam("orderBy") @DefaultValue("asc") String order) {
@@ -77,7 +79,7 @@ public class PersonEndpoint {
 
 	@PUT
 	public Response updatePerson(Person person) {
-		System.out.println("CHECK savePerson");
+		System.out.println("CHECK updatePerson");
 		Person updatedPerson = dao.updatePerson(person);
 
 		if (updatedPerson != null) {
@@ -90,6 +92,7 @@ public class PersonEndpoint {
 	@DELETE
 	@Path("/{id}")
 	public Response deletePerson(@PathParam("id") long id) {
+		System.out.println("CHECK deletePerson");
 		Person person = (Person) getPerson(id).getEntity();
 		if (person != null) {
 			Person deletedPerson = dao.deletePerson(person);
@@ -125,24 +128,40 @@ public class PersonEndpoint {
 										@FormParam("surname") String surname,
 										@FormParam("number") String number,
 										@Context HttpServletRequest request,
-										@Context HttpServletResponse response) throws ServletException, IOException
+										@Context HttpServletResponse response) throws IOException, ServletException
 	{
-		String warning = "";
+		System.out.println("CHECK savePersonFromForm");
 		if(!"".equals(name) && !"".equals(surname)) {
 			Person person = new Person();
 			person.setName(name);
 			person.setSurname(surname);
 			person.setNumbers(Arrays.asList(number));
 			dao.addPerson(person);
-			List<Person> persons = dao.getAllPersons();
-			request.getSession().setAttribute("persons", persons);
+			
+			message = "User " + person.getName() + " " + person.getSurname() + " sucesfully added.";
 		}else {
-			warning = "TRY AGAIN! Fields name and surname are obligatory";
+			message = "TRY AGAIN! Fields name and surname are obligatory.";
 		}
-		//request.setAttribute("persons", persons);
-		//request.getRequestDispatcher("/").forward(request, response);
 		
-		request.getSession().setAttribute("warning", warning);
+		request.getSession().setAttribute("message", message);
+		response.sendRedirect(request.getContextPath());
+	}
+	
+	@POST
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public void deletePersonFromForm(@PathParam ("id") long id,
+										@Context HttpServletRequest request,
+										@Context HttpServletResponse response) throws IOException, ServletException 
+	{
+		System.out.println("CHECK deletePersonFromForm");
+		Person person = dao.getPerson(id);
+		if (person != null) {
+			Person deletedPerson = dao.deletePerson(person);
+			message = "User " + deletedPerson.getName() + " " + deletedPerson.getSurname() + " sucesfully deleted.";
+			request.getSession().setAttribute("message", message);
+		}
+		
 		response.sendRedirect(request.getContextPath());
 	}
 	

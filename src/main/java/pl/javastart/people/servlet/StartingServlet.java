@@ -25,8 +25,12 @@ public class StartingServlet extends HttpServlet {
 		System.out.println("StartingServlet run");
 		List<Person> persons = dao.getAllPersons();
 		request.getSession().setAttribute("persons", persons);
-		request.getRequestDispatcher("people.jsp").forward(request, response);
-		
+		String message = (String) request.getSession().getAttribute("message");
+		if (message == null) {
+			message = "Witaj w aplikacji!";
+			request.getSession().setAttribute("message", message);
+		}
+		request.getRequestDispatcher("/people.jsp").forward(request, response);
 	}
 	
 	
