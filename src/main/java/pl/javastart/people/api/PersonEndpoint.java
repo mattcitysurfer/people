@@ -1,13 +1,13 @@
 package pl.javastart.people.api;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -28,15 +28,16 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import pl.javastart.people.domain.Person;
 import pl.javastart.people.persisatnce.PersonDAO;
 import pl.javastart.people.persisatnce.PersonDAOImplDBSimulator;
-import pl.javastart.people.servlet.StartingServlet;
 
 @Path("/persons")
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class PersonEndpoint {
 
+	private static final int TIMEOUT_LIMIT_IN_SECONDS = 1;
+	
 	private PersonDAO dao = new PersonDAOImplDBSimulator();
-	String message = null;
+	private String message = null;
 	
 	@GET
 	public Response getAllPersons(@QueryParam("orderBy") @DefaultValue("asc") String order) {
@@ -144,6 +145,9 @@ public class PersonEndpoint {
 		}
 		
 		request.getSession().setAttribute("message", message);
+		request.getSession().setAttribute("messageTimeout", LocalTime.now().plusSeconds(TIMEOUT_LIMIT_IN_SECONDS));
+
+		
 		response.sendRedirect(request.getContextPath());
 	}
 	
@@ -159,8 +163,10 @@ public class PersonEndpoint {
 		if (person != null) {
 			Person deletedPerson = dao.deletePerson(person);
 			message = "User " + deletedPerson.getName() + " " + deletedPerson.getSurname() + " sucesfully deleted.";
-			request.getSession().setAttribute("message", message);
 		}
+		
+		request.getSession().setAttribute("message", message);
+		request.getSession().setAttribute("messageTimeout", LocalTime.now().plusSeconds(TIMEOUT_LIMIT_IN_SECONDS));
 		
 		response.sendRedirect(request.getContextPath());
 	}

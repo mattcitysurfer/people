@@ -1,6 +1,8 @@
 package pl.javastart.people.servlet;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -23,16 +25,21 @@ public class StartingServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("StartingServlet run");
+		determineMessage(request);
 		List<Person> persons = dao.getAllPersons();
 		request.getSession().setAttribute("persons", persons);
-		String message = (String) request.getSession().getAttribute("message");
-		if (message == null) {
-			message = "Witaj w aplikacji!";
-			request.getSession().setAttribute("message", message);
-		}
 		request.getRequestDispatcher("/people.jsp").forward(request, response);
 	}
 	
-	
+	private void determineMessage(HttpServletRequest request) {
+		String message = (String) request.getSession().getAttribute("message");
+		LocalTime messageTimeout = (LocalTime) request.getSession().getAttribute("messageTimeout");
+		
+		if (message == null || Duration.between(LocalTime.now(), messageTimeout).isNegative()) {
+			message = "Witaj w aplikacji!";
+			request.getSession().setAttribute("messageTimeout", LocalTime.now());
+			request.getSession().setAttribute("message", message);
+		}
+	}
 
 }
