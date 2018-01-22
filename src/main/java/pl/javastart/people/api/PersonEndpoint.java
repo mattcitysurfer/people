@@ -136,7 +136,9 @@ public class PersonEndpoint {
 			Person person = new Person();
 			person.setName(name);
 			person.setSurname(surname);
-			person.setNumbers(Arrays.asList(number));
+			if (!"".equals(number)) {
+				person.setNumbers(Arrays.asList(number));
+			}
 			dao.addPerson(person);
 			
 			message = "User " + person.getName() + " " + person.getSurname() + " sucesfully added.";
