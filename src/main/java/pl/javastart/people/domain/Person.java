@@ -21,7 +21,7 @@ public class Person implements Serializable {
 	// @XmlTransient
 	private long id;
 
-	@XmlElement(name = "imię")
+	@XmlElement(name = "imie")
 	private String name;
 
 	@XmlElement(name = "nazwisko")
